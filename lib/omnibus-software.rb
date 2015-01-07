@@ -15,6 +15,7 @@
 #
 
 require 'pathname'
+require 'uri'
 
 module OmnibusSoftware
   VERSION = '4.0.0'
@@ -51,6 +52,10 @@ module OmnibusSoftware
         Omnibus::Software.load(project, name)
         $stdout.print '.'
       end
+    end
+
+    def gnu_archive_url(path)
+      (URI.parse(ENV['GNU_ARCHIVE_MIRROR'] || 'http://ftp.gnu.org/gnu') + path).to_s
     end
   end
 end

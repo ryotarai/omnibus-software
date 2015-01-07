@@ -17,7 +17,7 @@
 name "autoconf"
 default_version "2.68"
 
-source url: "http://ftp.gnu.org/gnu/autoconf/autoconf-#{version}.tar.gz",
+source url: OmnibusSoftware.gnu_archive_url("autoconf/autoconf-#{version}.tar.gz"),
        md5: "c3b5247592ce694f7097873aa07d66fe"
 
 relative_path "autoconf-#{version}"

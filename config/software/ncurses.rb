@@ -19,7 +19,7 @@ default_version "5.9"
 
 dependency "libtool" if aix?
 
-source url: "http://ftp.gnu.org/gnu/ncurses/ncurses-5.9.tar.gz",
+source url: OmnibusSoftware.gnu_archive_url("ncurses/ncurses-5.9.tar.gz"),
        md5: "8cb9c412e5f2d96bc6f459aa8c6282a1"
 
 relative_path "ncurses-5.9"
