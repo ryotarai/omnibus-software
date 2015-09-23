@@ -22,18 +22,16 @@ relative_path "chef"
 
 if windows?
   dependency "ruby-windows"
-  dependency "libyaml-windows"
   dependency "openssl-windows"
   dependency "ruby-windows-devkit"
   dependency "ruby-windows-devkit-bash"
   dependency "cacerts"
-  dependency "rubygems"
 else
   dependency "ruby"
-  dependency "rubygems"
   dependency "libffi"
 end
 
+dependency "rubygems"
 dependency "bundler"
 dependency "ohai"
 dependency "appbundler"
@@ -59,13 +57,17 @@ build do
       copy "#{install_dir}/embedded/mingw/bin/#{to}", "#{install_dir}/bin/#{target}"
     end
 
+    bundle "install --without server docgen", env: env
+
+    # Install components that live inside Chef's git repo. For now this is just
+    # 'chef-config'
+    bundle "exec rake install_components", env: env
+
     gem "build chef-{windows,x86-mingw32}.gemspec", env: env
 
     gem "install chef*mingw32.gem" \
         " --no-ri --no-rdoc" \
         " --verbose", env: env
-
-    bundle "install --without server docgen", env: env
 
     block "Build Event Log Dll" do
       Dir.chdir software.project_dir do
@@ -77,6 +79,10 @@ build do
 
     # install the whole bundle first
     bundle "install --without server docgen", env: env
+
+    # Install components that live inside Chef's git repo. For now this is just
+    # 'chef-config'
+    bundle "exec rake install_components", env: env
 
     gem "build chef.gemspec", env: env
 

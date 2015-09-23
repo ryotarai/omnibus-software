@@ -14,31 +14,30 @@
 # limitations under the License.
 #
 
-name "bash"
-default_version "4.3.30"
+name "figlet"
+default_version "2.2.5"
 
-dependency "libiconv"
-dependency "ncurses"
+version("2.2.5") { source md5: "eaaeb356007755c9770a842aefd8ed5f" }
 
-version("4.3.30") { source md5: "a27b3ee9be83bd3ba448c0ff52b28447" }
+source url: "https://github.com/cmatsuoka/figlet/archive/#{version}.tar.gz"
 
-source url: "http://ftp.gnu.org/gnu/bash/bash-#{version}.tar.gz"
-
-relative_path "bash-#{version}"
+relative_path "figlet-#{version}"
 
 build do
   env = with_standard_compiler_flags(with_embedded_path)
+  env['DEFAULTFONTDIR'] = "#{install_dir}/share/figlet/fonts"
+  env['prefix'] = "#{install_dir}/embedded"
 
-  configure_command = ["./configure",
-                       "--prefix=#{install_dir}/embedded"]
-
-  # On freebsd, you have to force static linking, otherwise the executable
-  # will link against the system ncurses instead of ours.
-  if freebsd?
-    configure_command << "--enable-static-link"
+  if aix?
+    # give us /opt/freeware/bin/patch
+    env['PATH'] = "/opt/freeware/bin:#{env['PATH']}"
+    env['CC'] = 'cc_r -q64'
+    env['LD'] = 'cc_r -q64'
+    patch source: "aix-figlet-cdefs.patch", plevel: 0, env: env
   end
 
-  command configure_command.join(" "), env: env
+  mkdir "#{install_dir}/share/figlet/fonts"
+
   make "-j #{workers}", env: env
-  make "-j #{workers} install", env: env
+  make "install -j #{workers}", env: env
 end

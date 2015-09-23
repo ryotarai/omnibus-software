@@ -1,5 +1,5 @@
 #
-# Copyright 2012-2014 Chef Software, Inc.
+# Copyright 2015 Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,22 +14,17 @@
 # limitations under the License.
 #
 
-name "bundler"
-default_version "1.5.3"
+name "figlet-fonts"
+default_version "master"
 
-dependency "rubygems"
+dependency "figlet"
 
-version "1.10.7.depsolverfix.0" do
-  source git: "https://github.com/chef/bundler.git"
-end
+source git: "git://github.com/cmatsuoka/figlet-fonts"
+
+relative_path "figlet-fonts-#{version}"
 
 build do
-  env = with_standard_compiler_flags(with_embedded_path)
-
-  if version == "1.10.7.depsolverfix.0"
-    gem "build bundler.gemspec"
-    gem "install bundler-#{version}.gem --no-ri --no-rdoc", env: env
-  else
-    gem "install bundler --version '#{version}' --no-ri --no-rdoc", env: env
-  end
+  mkdir "#{install_dir}/share/figlet/fonts"
+  copy "#{project_dir}/*/*.flc", "#{install_dir}/share/figlet/fonts/"
+  copy "#{project_dir}/*/*.flf", "#{install_dir}/share/figlet/fonts/"
 end
