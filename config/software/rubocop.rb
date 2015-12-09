@@ -1,5 +1,5 @@
 #
-# Copyright 2014 Chef Software, Inc.
+# Copyright 2015 Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,8 +14,17 @@
 # limitations under the License.
 #
 
-name "appbundler"
-default_version "0.6.0"
+name "rubocop"
+default_version "master"
+
+source git: "https://github.com/bbatsov/rubocop"
+
+if windows?
+  dependency "ruby-windows"
+  dependency "ruby-windows-devkit"
+else
+  dependency "ruby"
+end
 
 dependency "rubygems"
 dependency "bundler"
@@ -23,7 +32,9 @@ dependency "bundler"
 build do
   env = with_standard_compiler_flags(with_embedded_path)
 
-  gem "install appbundler" \
-      " --version '#{version}'" \
+  bundle "install --without development test", env: env
+
+  gem "build rubocop.gemspec", env: env
+  gem "install rubocop-*.gem" \
       " --no-ri --no-rdoc", env: env
 end

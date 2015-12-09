@@ -14,16 +14,28 @@
 # limitations under the License.
 #
 
-name "appbundler"
-default_version "0.6.0"
+name "chef-provisioning"
+default_version "master"
+
+source git: "git://github.com/chef/chef-provisioning.git"
+
+if windows?
+  dependency "ruby-windows"
+  dependency "ruby-windows-devkit"
+else
+  dependency "ruby"
+end
 
 dependency "rubygems"
 dependency "bundler"
+dependency "chef"
 
 build do
   env = with_standard_compiler_flags(with_embedded_path)
 
-  gem "install appbundler" \
-      " --version '#{version}'" \
+  bundle "install --without development", env: env
+
+  gem "build chef-provisioning.gemspec", env: env
+  gem "install chef-provisioning-*.gem" \
       " --no-ri --no-rdoc", env: env
 end

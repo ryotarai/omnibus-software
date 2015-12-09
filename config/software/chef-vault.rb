@@ -1,5 +1,5 @@
 #
-# Copyright 2014 Chef Software, Inc.
+# Copyright 2012-2014 Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,16 +14,30 @@
 # limitations under the License.
 #
 
-name "appbundler"
-default_version "0.6.0"
+name "chef-vault"
+default_version "v2.6.1"
+
+source git: "git://github.com/Nordstrom/chef-vault.git"
+
+relative_path "chef-vault"
+
+if windows?
+  dependency "ruby-windows"
+  dependency "ruby-windows-devkit"
+else
+  dependency "ruby"
+end
 
 dependency "rubygems"
 dependency "bundler"
+dependency "chef"
 
 build do
   env = with_standard_compiler_flags(with_embedded_path)
 
-  gem "install appbundler" \
-      " --version '#{version}'" \
+  bundle "install --without development", env: env
+
+  gem "build chef-vault.gemspec", env: env
+  gem "install chef-vault-*.gem" \
       " --no-ri --no-rdoc", env: env
 end

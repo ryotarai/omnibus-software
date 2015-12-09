@@ -14,16 +14,29 @@
 # limitations under the License.
 #
 
-name "appbundler"
-default_version "0.6.0"
+name "foodcritic"
+default_version "v5.0.0"
+
+source git: "git://github.com/acrmp/foodcritic.git"
+
+if windows?
+  dependency "ruby-windows"
+  dependency "ruby-windows-devkit"
+else
+  dependency "ruby"
+end
 
 dependency "rubygems"
 dependency "bundler"
+dependency "nokogiri"
+dependency "chef"
 
 build do
   env = with_standard_compiler_flags(with_embedded_path)
 
-  gem "install appbundler" \
-      " --version '#{version}'" \
+  bundle "install --without development", env: env
+
+  gem "build foodcritic.gemspec", env: env
+  gem "install foodcritic-*.gem" \
       " --no-ri --no-rdoc", env: env
 end

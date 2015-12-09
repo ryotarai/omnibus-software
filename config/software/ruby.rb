@@ -22,9 +22,8 @@ dependency "ncurses"
 dependency "libedit"
 dependency "openssl"
 dependency "libyaml"
-dependency "libiconv"
+dependency "libiconv" # Removal will break chef_gem installs of (e.g.) nokogiri on upgrades
 dependency "libffi"
-dependency "gdbm"
 dependency "patch" if solaris2?
 
 version("1.9.3-p484") { source md5: "8ac0dee72fe12d75c8b2d0ef5d0c2968" }
@@ -129,6 +128,17 @@ build do
     # be fixed.
   end
 
+  # Fix reserve stack segmentation fault when building on RHEL5 or below
+  # Currently only affects 2.1.7 and 2.2.3. This patch taken from the fix
+  # in Ruby trunk and expected to be included in future point releases.
+  # https://redmine.ruby-lang.org/issues/11602
+  if ohai['platform_family'] == 'rhel'  &&
+     ohai['platform_version'].to_f < 6  &&
+     (version == '2.1.7' || version == '2.2.3')
+
+     patch source: 'ruby-fix-reserve-stack-segfault.patch', plevel: 1, env: patch_env
+  end
+
   configure_command = ["./configure",
                        "--prefix=#{install_dir}/embedded",
                        "--with-out-ext=dbm",
@@ -137,6 +147,7 @@ build do
                        "--with-ext=psych",
                        "--disable-install-doc",
                        "--without-gmp",
+                       "--without-gdbm",
                        "--disable-dtrace"]
 
   case ohai['platform']
